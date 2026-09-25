@@ -1,0 +1,31 @@
+services:
+  web:
+    build: .
+    image: dome-drill:latest
+    # 宿主机端口通过环境变量 HOST_PORT 配置，默认 8080
+    ports:
+      - "${HOST_PORT:-8080}:8000"
+    environment:
+      PORT: "8000"
+      EVENTS_PATH: /data/events.jsonl
+    volumes:
+      - event-data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import os,urllib.request; urllib.request.urlopen('http://127.0.0.1:'+os.environ.get('PORT','8000')+'/healthz', timeout=2)"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # 一次性验收服务：编译检查 + 单元测试 + 几何业务/HTTP 冒烟，
+  # 运行后自行退出，退出码即验收结果（0 通过 / 非 0 失败）。
+  # 随 docker compose up 自动执行一次，也可单独运行：
+  #   docker compose run --rm verify
+  verify:
+    build: .
+    image: dome-drill:latest
+    entrypoint: ["sh", "scripts/verify.sh"]
+    restart: "no"
+
+volumes:
+  event-data:

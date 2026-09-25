@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>移动式穹顶测绘平台 · 安全操作演练</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+<header>
+  <h1>移动式穹顶测绘平台 · 安全操作演练</h1>
+  <div id="statusbar" class="statusbar">
+    <span>修订号 <b id="rev">—</b></span>
+    <span>当前姿态 <b id="cur-pose">—</b></span>
+    <span>支承状态 <b id="safety">未启动</b></span>
+  </div>
+  <div id="reject-banner" class="banner hidden"></div>
+</header>
+
+<main>
+  <section id="setup-panel" class="panel">
+    <h2>1. 录入部署数据</h2>
+    <div class="grid2">
+      <div>
+        <h3>支腿平面坐标（4–6 只）</h3>
+        <table id="legs-table">
+          <thead><tr><th>#</th><th>x</th><th>y</th><th>初始部署</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <button id="add-leg" type="button">增加支腿</button>
+      </div>
+      <div>
+        <h3>载荷姿态投影（4–8 个）</h3>
+        <table id="poses-table">
+          <thead><tr><th>#</th><th>中心 x</th><th>中心 y</th><th>不确定半径 r</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <button id="add-pose" type="button">增加姿态</button>
+        <label class="block">初始姿态：
+          <select id="current-pose-select"></select>
+        </label>
+      </div>
+    </div>
+    <button id="start-btn" class="primary" type="button">启动演练</button>
+    <p class="hint">初始部署状态必须已能完整包含初始姿态的误差圆盘（边界相切视为安全），否则启动将被拒绝。</p>
+  </section>
+
+  <section id="drill-panel" class="panel hidden">
+    <h2>2. 演练操作（每次只能切换一个姿态，或收放一只支腿）</h2>
+    <div class="grid2">
+      <div>
+        <h3>支腿状态</h3>
+        <div id="leg-buttons"></div>
+      </div>
+      <div>
+        <h3>载荷姿态</h3>
+        <div id="pose-buttons"></div>
+      </div>
+    </div>
+    <p class="hint">所有操作携带当前所见修订号；修订号过期、圆盘越界或部署支腿不足以形成安全支承的操作会被明确拒绝，且不会写入事件轨迹。</p>
+  </section>
+
+  <section class="panel">
+    <h2>当前支承多边形</h2>
+    <canvas id="view" width="720" height="560"></canvas>
+    <div class="legend">
+      <span><i class="sw hull"></i>已部署支腿凸包（支承面）</span>
+      <span><i class="sw disk"></i>当前载荷圆盘（中心 + 不确定半径）</span>
+      <span><i class="sw dep"></i>已部署支腿</span>
+      <span><i class="sw stow"></i>已收起支腿</span>
+      <span><i class="sw other"></i>其他姿态投影中心</span>
+    </div>
+  </section>
+</main>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
